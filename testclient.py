@@ -11,7 +11,7 @@ async def keyboard_inputs(websocket):
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # Handle window close
-                websocket.close()
+                await websocket.close()
                 return  
 
             if event.type == pygame.KEYDOWN:  # Detect when a key is pressed
@@ -26,7 +26,7 @@ async def keyboard_inputs(websocket):
                 elif event.key == pygame.K_p:
                     await websocket.send("POS a")
                 elif event.key == pygame.K_ESCAPE:
-                    websocket.close()
+                    await websocket.close()
                     return
 
         pygame.display.flip()
