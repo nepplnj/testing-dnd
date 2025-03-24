@@ -7,7 +7,7 @@ pygame.init()
 
 
 async def keyboard_inputs(websocket):
-    print("Listening for key presses...")
+    print("Open the python window!")
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # Handle window close
