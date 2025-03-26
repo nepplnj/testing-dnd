@@ -1,18 +1,21 @@
 import asyncio
 import websockets
 import pygame
+from typing import Dict
 
 
 def refresh():  # Function to refresh the grid map
-    #df = pandas.read_excel(map,header=None)
-    #matrix = df.values.tolist()
     global matrix
     for i in range(round(xlen/dist)):
         for j in range(round(ylen/dist)):
                 pygame.draw.rect(screen, colors[matrix[i][j]], (j*dist, i*dist, dist, dist))
+    for uid, pos in player_pos.items():
+        pygame.draw.rect(screen, red, (pos[0]*dist, pos[1]*dist, dist, dist))
     pygame.display.flip()
 
 pygame.init()
+
+player_pos: Dict[str, tuple] = {}
 
 
 #define some vars
@@ -25,8 +28,7 @@ blue = (0, 0, 255)
 xlen = 800
 ylen = 800
 colors = [white, black, red, green, blue]
-matrix = ""
-
+matrix = [[0 for _ in range(50)] for _ in range(50)]
 
 
 async def keyboard_inputs(websocket):
@@ -70,12 +72,21 @@ async def receive_messages(websocket):
             mat = message.split(' ',1)
             matrix = eval(mat[1])
             refresh()
+        elif message.find("JOIN") != -1:
+            temp = message.split(' ',2)
+            player_pos[temp[1]] = eval(temp[2])
+            refresh()
+        elif message.find("LOC") != -1:
+            temp = message.split(' ',2)
+            player_pos[temp[1]] = eval(temp[2])
+            refresh()
         print(f"{message}")
 
 async def connect():
     name = input("What's your name? ")
-    ip = input("Host ipv4: ")
+    ip = input("Host IPv4: ")
     uri = "ws://" + ip + ":8000/ws/" + name
+    player_pos[name] = (0,0)
     async with websockets.connect(uri) as websocket:
         print("Connected to server!")
         global screen
