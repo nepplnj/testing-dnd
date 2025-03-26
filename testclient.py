@@ -2,8 +2,33 @@ import asyncio
 import websockets
 import aioconsole  # Asynchronous console input
 import pygame
+import pandas
+
+
+def refresh():  # Function to refresh the grid map
+    #df = pandas.read_excel(map,header=None)
+    #matrix = df.values.tolist()
+    global matrix
+    for i in range(round(xlen/dist)):
+        for j in range(round(ylen/dist)):
+                pygame.draw.rect(screen, colors[matrix[i][j]], (j*dist, i*dist, dist, dist))
+    pygame.display.flip()
 
 pygame.init()
+
+
+#define some vars
+dist = 50
+white = (255, 255, 255)
+black = (0, 0, 0)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+xlen = 800
+ylen = 800
+colors = [white, black, red, green, blue]
+matrix = ""
+
 
 
 async def keyboard_inputs(websocket):
@@ -25,8 +50,11 @@ async def keyboard_inputs(websocket):
                     await websocket.send("MOVE E")
                 elif event.key == pygame.K_p:
                     await websocket.send("POS a")
+                elif event.key == pygame.K_r:
+                    refresh()
                 elif event.key == pygame.K_ESCAPE:
                     await websocket.close()
+                    pygame.quit()
                     return
 
         pygame.display.flip()
@@ -39,33 +67,25 @@ async def receive_messages(websocket):
     while True:
         # Wait for a message from the server
         message = await websocket.recv()
+        if message.find("MAP") != -1:
+            global matrix
+            mat = message.split(' ',1)
+            matrix = eval(mat[1])
+            refresh()
         print(f"{message}")
-
-# Function to send user input to the server
-async def send_input(websocket):
-    while True:
-        # Use aioconsole to handle async input without blocking
-        message = await aioconsole.ainput("")
-
-        if message.lower() == "exit":
-            print("Closing connection...")
-            await websocket.close()
-            break
-
-        # Send the typed message to the server
-        await websocket.send(message)
 
 async def connect():
     name = input("What's your name? ")
-    uri = "ws://137.112.213.234:8000/ws/" + name
+    uri = "ws://192.168.1.247:8000/ws/" + name
     async with websockets.connect(uri) as websocket:
         print("Connected to server!")
-        screen = pygame.display.set_mode((400, 300))
+        global screen
+        screen = pygame.display.set_mode((xlen, ylen))
+        pygame.display.set_caption("Grid Map")
 
         # Run both tasks concurrently: one for receiving and one for sending
         await asyncio.gather(
-            receive_messages(websocket),  # This task will keep listening for server messages
-            #send_input(websocket),     # This task will handle user input and sending
+            receive_messages(websocket),
             keyboard_inputs(websocket)
         )
 

@@ -5,8 +5,12 @@ map = 'checkmap.xlsx'
 dist = 50
 white = (255, 255, 255)
 black = (0, 0, 0)
+red = (255, 0, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
 xlen = 800
 ylen = 800
+colors = [white, black, red, green, blue]
 
 
 def refresh():
@@ -14,10 +18,7 @@ def refresh():
     matrix = df.values.tolist()
     for i in range(round(xlen/dist)):
         for j in range(round(ylen/dist)):
-            if matrix[i][j] == 1:
-                pygame.draw.rect(screen, black, (j*dist, i*dist, dist, dist))
-            elif matrix[i][j] == 2:
-                 pygame.draw.rect(screen, white, (j*dist, i*dist, dist, dist))
+                pygame.draw.rect(screen, colors[matrix[i][j]], (j*dist, i*dist, dist, dist))
     pygame.display.flip()
 
 
