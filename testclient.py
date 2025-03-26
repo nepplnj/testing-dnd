@@ -74,7 +74,8 @@ async def receive_messages(websocket):
 
 async def connect():
     name = input("What's your name? ")
-    uri = "ws://192.168.1.247:8000/ws/" + name
+    ip = input("Host ipv4: ")
+    uri = "ws://" + ip + ":8000/ws/" + name
     async with websockets.connect(uri) as websocket:
         print("Connected to server!")
         global screen

@@ -75,4 +75,5 @@ async def websocket_endpoint(websocket: WebSocket, UserID: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="192.168.1.247", port=8000)
+    ip = input("Host ipv4: ")
+    uvicorn.run(app, host=ip, port=8000)
