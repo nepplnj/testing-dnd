@@ -1,8 +1,6 @@
 import asyncio
 import websockets
-import aioconsole  # Asynchronous console input
 import pygame
-import pandas
 
 
 def refresh():  # Function to refresh the grid map
